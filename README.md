@@ -3,7 +3,7 @@ Full python implementation of n dimensional quadtree
 
 Example:
 ```python
-from quadtree import *
+from quadtree import NQTree, DataPoint, Point, Cuboid, HyperSphere
 
 # Create the root node
 space_dimensions = [
