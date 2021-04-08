@@ -1,11 +1,12 @@
-
 class Point:
     def __init__(self, *args):
         self.dims: list = args
         self.dim_len = len(self.dims)
 
     def distance(self, other_point):
-        sum_count = sum(map(lambda x: (x[0] - x[1]) ** 2, zip(self.dims, other_point.dims)))
+        sum_count = sum(
+            map(lambda x: (x[0] - x[1]) ** 2, zip(self.dims, other_point.dims))
+        )
         return sum_count ** 0.5
 
     def copy(self):
@@ -41,7 +42,10 @@ class Cuboid:
 
     def contain(self, point):
         for dim_index, dim_value in enumerate(point):
-            if not self.min_point[dim_index] < dim_value or not self.max_point[dim_index] > dim_value:
+            if (
+                not self.min_point[dim_index] < dim_value
+                or not self.max_point[dim_index] > dim_value
+            ):
                 return False
         return True
 
@@ -68,7 +72,13 @@ class DataPoint:
 
 
 class NQTree(Cuboid):
-    def __init__(self, dimensions: list, max_data_points: int, minimum_point: Point = None, maximum_point: Point = None):
+    def __init__(
+        self,
+        dimensions: list,
+        max_data_points: int,
+        minimum_point: Point = None,
+        maximum_point: Point = None,
+    ):
         if not (minimum_point and maximum_point):
             minimum_point, maximum_point = self._create_min_max_points(dimensions)
         super().__init__(minimum_point, maximum_point)
@@ -80,10 +90,14 @@ class NQTree(Cuboid):
         self.divided = False
 
     def _create_min_max_points(self, dimensions):
-        return Point(*[dim[0] for dim in dimensions]), Point(*[dim[1] for dim in dimensions])
+        return Point(*[dim[0] for dim in dimensions]), Point(
+            *[dim[1] for dim in dimensions]
+        )
 
     def divide(self):
-        middle_point = Point(*[(minp + maxp)/2 for minp, maxp in zip(self.min_point, self.max_point)])
+        middle_point = Point(
+            *[(minp + maxp) / 2 for minp, maxp in zip(self.min_point, self.max_point)]
+        )
         points = [middle_point]
         new_points = []
         for index, dimension in enumerate(self.dimensions):
@@ -113,7 +127,7 @@ class NQTree(Cuboid):
                     self.dimensions,
                     minimum_point=Point(*min_point),
                     maximum_point=Point(*max_point),
-                    max_data_points=self.max_points
+                    max_data_points=self.max_points,
                 )
             )
         self.childes = childes
@@ -137,8 +151,12 @@ class NQTree(Cuboid):
             if shape.contain(Point(*edge_point)):
                 return True
         if isinstance(shape, HyperSphere):
-            middle_point = Point(*map(lambda x: (x[0] + x[1]) / 2, zip(self.min_point, self.max_point)))
-            if self.center_to_edge_length() + shape.radius < middle_point.distance(shape.center_point):
+            middle_point = Point(
+                *map(lambda x: (x[0] + x[1]) / 2, zip(self.min_point, self.max_point))
+            )
+            if self.center_to_edge_length() + shape.radius < middle_point.distance(
+                shape.center_point
+            ):
                 return True
         return False
 
@@ -160,9 +178,15 @@ class NQTree(Cuboid):
     def __repr__(self):
         return str(self)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Create the root node
-    space_dimensions = [[0, 100], [0, 100], [10, 200], [100, 300]]  # Define 4 dimensions space
+    space_dimensions = [
+        [0, 100],
+        [0, 100],
+        [10, 200],
+        [100, 300],
+    ]  # Define 4 dimensions space
     # for example the x axis is defined from 0 to 100 and the z axis is defined from 10 to 200
     t = NQTree(space_dimensions, max_data_points=2)
 
@@ -172,9 +196,13 @@ if __name__ == '__main__':
     t.insert(DataPoint("in circle and cube", Point(30, 30, 30, 131)))
 
     # Search shapes
-    cube = Cuboid(min_point=Point(15, 15, 25, 115), max_point=Point(35, 35, 90, 135))  # defined by 2 points
+    cube = Cuboid(
+        min_point=Point(15, 15, 25, 115), max_point=Point(35, 35, 90, 135)
+    )  # defined by 2 points
     # Cuboid is N-dimension rectangle
     circle = HyperSphere(center_point=Point(20, 22, 23, 122), radius=20.0)
 
-    search_result_cube = t.search(cube)  # -> Return list of points within this shape in O(log n) time
+    search_result_cube = t.search(
+        cube
+    )  # -> Return list of points within this shape in O(log n) time
     search_result_circle = t.search(circle)  # -> Same just for the HyperSphere
